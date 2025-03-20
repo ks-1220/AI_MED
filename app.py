@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
+import shap
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from scipy.sparse import hstack
 from xgboost import XGBRegressor, XGBClassifier
@@ -41,3 +44,11 @@ if data_input is not None:
     elif page == "Recruitment Rate (PS-4)":
         st.title("Predict Recruitment Rate")
         st.write(pd.DataFrame({"Recruitment Rate Prediction": y_pred[:, 2]}))
+
+    # SHAP Explanation
+    explainer = shap.Explainer(model.regression_model.estimators_[0], X_test)
+    shap_values = explainer.shap_values(X_test)
+    st.subheader("Feature Importance using SHAP")
+    plt.figure()
+    shap.summary_plot(shap_values, X_test)
+    st.pyplot(plt)
